@@ -7,9 +7,9 @@
             }
         ],
         "Category": "Utilities",
-        "Description": "Get LLM's right in the Plasma Desktop",
+        "Description": "Your own AI assistant for Plasma Desktop",
         "Icon": "kstars_supernovae",
-        "Id": "org.kde.plasma.helloworld.kopilot",
+        "Id": "org.kde.plasma.kopilot",
         "Name": "Kopilot",
         "Version": "1",
         "Website": "https://example.com/user/plasmoid-helloworldplugin",
