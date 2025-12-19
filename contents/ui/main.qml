@@ -272,14 +272,17 @@ PlasmoidItem {
                             Layout.preferredWidth: implicitWidth
                             Layout.preferredHeight: implicitHeight
 
-                            PlasmaComponents.Label {
+                            TextEdit {
                                 id: msgText
                                 anchors.fill: parent
                                 anchors.margins: Kirigami.Units.largeSpacing
                                 text: model.message
                                 wrapMode: Text.Wrap
-                                textFormat: Text.PlainText
+                                textFormat: Text.MarkdownText
+                                readOnly: true
+                                selectByMouse: true
                                 color: model.sender === "user" ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                                font: Kirigami.Theme.defaultFont
                             }
                         }
 

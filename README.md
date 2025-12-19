@@ -192,7 +192,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [ ] Streaming responses
 - [ ] Image support for vision models
 - [ ] Conversation history persistence
-- [ ] Markdown rendering
+- [x] Markdown rendering
 - [ ] Code syntax highlighting
 - [ ] Voice input support
 - [ ] Multiple conversation threads
