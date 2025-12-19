@@ -254,7 +254,7 @@ PlasmoidItem {
                             
                             // Implicit size based on text
                             implicitWidth: msgText.implicitWidth + Kirigami.Units.largeSpacing * 2
-                            implicitHeight: msgText.implicitHeight + Kirigami.Units.largeSpacing
+                            implicitHeight: msgText.implicitHeight + Kirigami.Units.largeSpacing * 2
                             Layout.preferredWidth: implicitWidth
                             Layout.preferredHeight: implicitHeight
 
@@ -294,6 +294,8 @@ PlasmoidItem {
             // Input Area
             RowLayout {
                 Layout.fillWidth: true
+                Layout.bottomMargin: Kirigami.Units.smallSpacing
+                spacing: Kirigami.Units.smallSpacing
                 
                 PlasmaComponents.TextField {
                     id: inputField
