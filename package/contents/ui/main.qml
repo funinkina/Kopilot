@@ -9,6 +9,15 @@ import org.kde.kirigami as Kirigami
 PlasmoidItem {
     id: root
 
+    // Clipboard helper
+    function copyToClipboard(text) {
+        var clipboardItem = Qt.createQmlObject('import QtQuick; TextEdit { visible: false }', root);
+        clipboardItem.text = text;
+        clipboardItem.selectAll();
+        clipboardItem.copy();
+        clipboardItem.destroy();
+    }
+
     // Access configuration
     property string systemPrompt: Plasmoid.configuration.systemPrompt
     property bool isLoading: false
@@ -167,31 +176,63 @@ PlasmoidItem {
                     width: ListView.view.width
                     spacing: Kirigami.Units.smallSpacing
 
-                    // Message Bubble
-                    Rectangle {
+                    // Message Bubble with hover and copy
+                    Item {
                         Layout.alignment: model.sender === "user" ? Qt.AlignRight : Qt.AlignLeft
                         Layout.maximumWidth: parent.width * 0.8
-                        
-                        // Use Kirigami colors
-                        color: model.sender === "user" ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
-                        
-                        // Add a border for the AI message to distinguish it better if background is similar
-                        border.color: model.sender === "user" ? "transparent" : Kirigami.Theme.separatorColor
-                        border.width: 1
+                        implicitWidth: messageBubble.implicitWidth
+                        implicitHeight: messageBubble.implicitHeight
 
-                        radius: Kirigami.Units.smallSpacing
-                        
-                        // Implicit size based on text
-                        implicitWidth: msgText.implicitWidth + Kirigami.Units.largeSpacing
-                        implicitHeight: msgText.implicitHeight + Kirigami.Units.largeSpacing
+                        Rectangle {
+                            id: messageBubble
+                            width: parent.width
+                            height: parent.height
+                            
+                            // Use Kirigami colors
+                            color: model.sender === "user" ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
+                            
+                            // Add a border for the AI message to distinguish it better if background is similar
+                            border.color: model.sender === "user" ? "transparent" : Kirigami.Theme.separatorColor
+                            border.width: 1
 
-                        PlasmaComponents.Label {
-                            id: msgText
-                            anchors.centerIn: parent
-                            width: parent.width - Kirigami.Units.largeSpacing
-                            text: model.message
-                            wrapMode: Text.Wrap
-                            color: model.sender === "user" ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                            radius: Kirigami.Units.smallSpacing
+                            
+                            // Implicit size based on text
+                            implicitWidth: msgText.implicitWidth + Kirigami.Units.largeSpacing * 2
+                            implicitHeight: msgText.implicitHeight + Kirigami.Units.largeSpacing
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.margins: Kirigami.Units.smallSpacing
+                                spacing: Kirigami.Units.smallSpacing
+
+                                PlasmaComponents.Label {
+                                    id: msgText
+                                    Layout.fillWidth: true
+                                    text: model.message
+                                    wrapMode: Text.Wrap
+                                    textFormat: Text.PlainText
+                                    color: model.sender === "user" ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                                }
+
+                                PlasmaComponents.ToolButton {
+                                    id: copyButton
+                                    icon.name: "edit-copy"
+                                    visible: messageHoverHandler.hovered
+                                    onClicked: {
+                                        root.copyToClipboard(model.message)
+                                    }
+                                    Layout.alignment: Qt.AlignTop
+                                    
+                                    PlasmaComponents.ToolTip {
+                                        text: "Copy message"
+                                    }
+                                }
+                            }
+                        }
+
+                        HoverHandler {
+                            id: messageHoverHandler
                         }
                     }
                 }
