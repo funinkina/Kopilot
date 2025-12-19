@@ -1,0 +1,20 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "funinkina@proton.me",
+                "Name": "Aryan Kushwaha"
+            }
+        ],
+        "Category": "Utilities",
+        "Description": "Get LLM's right in the Plasma Desktop",
+        "Icon": "kstars_supernovae",
+        "Id": "org.kde.plasma.helloworld.kopilot",
+        "Name": "Kopilot",
+        "Version": "1",
+        "Website": "https://example.com/user/plasmoid-helloworldplugin",
+        "BugReportUrl": "https://example.com/user/plasmoid-helloworldplugin/bugs"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "KPackageStructure": "Plasma/Applet"
+}

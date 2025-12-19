@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name="" />
+    <group name="General">
+        <entry name="apiKey" type="String">
+            <label>API Key</label>
+            <default></default>
+        </entry>
+        <entry name="apiUrl" type="String">
+            <label>API URL</label>
+            <default>https://api.openai.com/v1/chat/completions</default>
+        </entry>
+        <entry name="modelName" type="String">
+            <label>Model Name</label>
+            <default>gpt-3.5-turbo</default>
+        </entry>
+        <entry name="systemPrompt" type="String">
+            <label>System Prompt</label>
+            <default>You are a helpful assistant.</default>
+        </entry>
+    </group>
+</kcfg>
