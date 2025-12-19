@@ -98,8 +98,6 @@ PlasmoidItem {
     compactRepresentation: Item {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        Layout.minimumWidth: Kirigami.Units.iconSizes.small
-        Layout.minimumHeight: Kirigami.Units.iconSizes.small
         
         Kirigami.Icon {
             id: icon
