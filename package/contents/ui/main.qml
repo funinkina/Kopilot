@@ -10,9 +10,30 @@ PlasmoidItem {
     id: root
 
     // Access configuration
-    property string selectedProvider: Plasmoid.configuration.selectedProvider
     property string systemPrompt: Plasmoid.configuration.systemPrompt
     property bool isLoading: false
+    property string selectedProvider: Plasmoid.configuration.selectedProvider
+    
+    // Available providers (those with API keys configured)
+    property var availableProviders: {
+        var providers = []
+        if (Plasmoid.configuration.openaiApiKey !== "") {
+            providers.push({text: "OpenAI", value: "openai"})
+        }
+        if (Plasmoid.configuration.anthropicApiKey !== "") {
+            providers.push({text: "Anthropic", value: "anthropic"})
+        }
+        if (Plasmoid.configuration.googleApiKey !== "") {
+            providers.push({text: "Google", value: "google"})
+        }
+        if (Plasmoid.configuration.groqApiKey !== "") {
+            providers.push({text: "Groq", value: "groq"})
+        }
+        if (Plasmoid.configuration.customApiKey !== "" || Plasmoid.configuration.customApiUrl !== "") {
+            providers.push({text: "Custom", value: "custom"})
+        }
+        return providers
+    }
     
     // Helper properties to get current provider settings
     property string currentApiKey: {
@@ -20,6 +41,7 @@ PlasmoidItem {
             case "openai": return Plasmoid.configuration.openaiApiKey
             case "anthropic": return Plasmoid.configuration.anthropicApiKey
             case "google": return Plasmoid.configuration.googleApiKey
+            case "groq": return Plasmoid.configuration.groqApiKey
             case "custom": return Plasmoid.configuration.customApiKey
             default: return ""
         }
@@ -30,6 +52,7 @@ PlasmoidItem {
             case "openai": return Plasmoid.configuration.openaiApiUrl
             case "anthropic": return Plasmoid.configuration.anthropicApiUrl
             case "google": return Plasmoid.configuration.googleApiUrl
+            case "groq": return Plasmoid.configuration.groqApiUrl
             case "custom": return Plasmoid.configuration.customApiUrl
             default: return ""
         }
@@ -40,6 +63,7 @@ PlasmoidItem {
             case "openai": return Plasmoid.configuration.openaiModel
             case "anthropic": return Plasmoid.configuration.anthropicModel
             case "google": return Plasmoid.configuration.googleModel
+            case "groq": return Plasmoid.configuration.groqModel
             case "custom": return Plasmoid.configuration.customModel
             default: return ""
         }
@@ -59,6 +83,46 @@ PlasmoidItem {
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: Kirigami.Units.smallSpacing
+
+            // Provider Selector
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Kirigami.Units.smallSpacing
+
+                PlasmaComponents.Label {
+                    text: "Provider:"
+                }
+
+                PlasmaComponents.ComboBox {
+                    id: providerSelector
+                    Layout.fillWidth: true
+                    model: root.availableProviders
+                    textRole: "text"
+                    valueRole: "value"
+                    
+                    currentIndex: {
+                        for (var i = 0; i < root.availableProviders.length; i++) {
+                            if (root.availableProviders[i].value === root.selectedProvider) {
+                                return i
+                            }
+                        }
+                        return 0
+                    }
+                    
+                    onActivated: {
+                        root.selectedProvider = currentValue
+                        Plasmoid.configuration.selectedProvider = currentValue
+                    }
+                    
+                    visible: root.availableProviders.length > 0
+                }
+
+                PlasmaComponents.Label {
+                    text: "No providers configured"
+                    visible: root.availableProviders.length === 0
+                    color: Kirigami.Theme.negativeTextColor
+                }
+            }
 
             // Chat History
             ListView {

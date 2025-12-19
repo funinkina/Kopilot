@@ -55,6 +55,20 @@
             <default>https://generativelanguage.googleapis.com/v1/models/</default>
         </entry>
     </group>
+    <group name="Groq">
+        <entry name="groqApiKey" type="String">
+            <label>Groq API Key</label>
+            <default></default>
+        </entry>
+        <entry name="groqModel" type="String">
+            <label>Groq Model</label>
+            <default>llama-3.3-70b-versatile</default>
+        </entry>
+        <entry name="groqApiUrl" type="String">
+            <label>Groq API URL</label>
+            <default>https://api.groq.com/openai/v1/chat/completions</default>
+        </entry>
+    </group>
     <group name="Custom">
         <entry name="customApiKey" type="String">
             <label>Custom API Key</label>
