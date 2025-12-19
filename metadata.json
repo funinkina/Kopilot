@@ -11,6 +11,7 @@
         "Icon": "kstars_supernovae",
         "Id": "org.kde.plasma.kopilot",
         "Name": "Kopilot",
+        "License": "MIT",
         "Version": "1",
         "Website": "https://github.com/funinkina/Kopilot",
         "BugReportUrl": "https://github.com/funinkina/Kopilot/issues"
