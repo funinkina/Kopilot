@@ -14,6 +14,9 @@ PlasmoidItem {
     property bool isLoading: false
     property string selectedProvider: Plasmoid.configuration.selectedProvider
     
+    // Chat model at root level so functions can access it
+    property ListModel chatModel: ListModel {}
+    
     // Available providers (those with API keys configured)
     property var availableProviders: {
         var providers = []
@@ -74,6 +77,24 @@ PlasmoidItem {
         onClicked: root.expanded = !root.expanded
     }
 
+    // Ensure selected provider is valid on startup
+    Component.onCompleted: {
+        // Check if current selected provider is in available providers
+        var providerFound = false
+        for (var i = 0; i < availableProviders.length; i++) {
+            if (availableProviders[i].value === selectedProvider) {
+                providerFound = true
+                break
+            }
+        }
+        
+        // If not found and we have providers, use the first one
+        if (!providerFound && availableProviders.length > 0) {
+            selectedProvider = availableProviders[0].value
+            Plasmoid.configuration.selectedProvider = availableProviders[0].value
+        }
+    }
+
     fullRepresentation: Item {
         Layout.minimumWidth: Kirigami.Units.gridUnit * 20
         Layout.minimumHeight: Kirigami.Units.gridUnit * 30
@@ -100,13 +121,20 @@ PlasmoidItem {
                     textRole: "text"
                     valueRole: "value"
                     
-                    currentIndex: {
+                    Component.onCompleted: {
+                        // Set initial index based on selected provider
                         for (var i = 0; i < root.availableProviders.length; i++) {
                             if (root.availableProviders[i].value === root.selectedProvider) {
-                                return i
+                                currentIndex = i
+                                return
                             }
                         }
-                        return 0
+                        // If selected provider not found, use first available
+                        if (root.availableProviders.length > 0) {
+                            currentIndex = 0
+                            root.selectedProvider = root.availableProviders[0].value
+                            Plasmoid.configuration.selectedProvider = root.availableProviders[0].value
+                        }
                     }
                     
                     onActivated: {
@@ -130,7 +158,7 @@ PlasmoidItem {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 clip: true
-                model: ListModel { id: chatModel }
+                model: root.chatModel
                 
                 // Add spacing at the bottom
                 footer: Item { height: Kirigami.Units.smallSpacing }
@@ -181,25 +209,34 @@ PlasmoidItem {
                     id: inputField
                     Layout.fillWidth: true
                     placeholderText: "Ask something..."
-                    onAccepted: sendMessage()
+                    onAccepted: {
+                        if (inputField.text.trim().length > 0 && !root.isLoading) {
+                            root.sendMessage(inputField.text)
+                            inputField.text = ""
+                        }
+                    }
                 }
 
                 PlasmaComponents.Button {
                     icon.name: "document-send"
-                    onClicked: sendMessage()
+                    onClicked: {
+                        if (inputField.text.trim().length > 0 && !root.isLoading) {
+                            root.sendMessage(inputField.text)
+                            inputField.text = ""
+                        }
+                    }
                     enabled: inputField.text.trim().length > 0 && !root.isLoading
                 }
             }
         }
     }
 
-    function sendMessage() {
-        var text = inputField.text.trim()
+    function sendMessage(text) {
+        text = text.trim()
         if (text === "") return
 
         // Add user message
-        chatModel.append({ "sender": "user", "message": text })
-        inputField.text = ""
+        root.chatModel.append({ "sender": "user", "message": text })
         root.isLoading = true
 
         // Call API
@@ -207,6 +244,34 @@ PlasmoidItem {
     }
 
     function callApi(prompt) {
+        // Debug output
+        console.log("=== Debug Info ===");
+        console.log("Selected Provider:", root.selectedProvider);
+        console.log("Current API Key:", root.currentApiKey === "" ? "EMPTY" : "SET");
+        console.log("Current API URL:", root.currentApiUrl);
+        console.log("Current Model:", root.currentModel);
+        console.log("Groq API Key from config:", Plasmoid.configuration.groqApiKey === "" ? "EMPTY" : "SET");
+        console.log("==================");
+        
+        // Check if provider is configured
+        if (root.currentApiKey === "" && root.selectedProvider !== "custom") {
+            root.isLoading = false;
+            root.chatModel.append({ "sender": "ai", "message": "Please configure your API Key in the settings." });
+            return;
+        }
+        
+        if (root.currentApiUrl === "") {
+            root.isLoading = false;
+            root.chatModel.append({ "sender": "ai", "message": "Please configure the API URL in the settings." });
+            return;
+        }
+        
+        if (root.currentModel === "") {
+            root.isLoading = false;
+            root.chatModel.append({ "sender": "ai", "message": "Please configure the model in the settings." });
+            return;
+        }
+
         var xhr = new XMLHttpRequest();
         xhr.open("POST", root.currentApiUrl);
         xhr.setRequestHeader("Content-Type", "application/json");
@@ -238,12 +303,12 @@ PlasmoidItem {
                             reply = response.choices[0].message.content;
                         }
                         
-                        chatModel.append({ "sender": "ai", "message": reply });
+                        root.chatModel.append({ "sender": "ai", "message": reply });
                     } catch (e) {
-                        chatModel.append({ "sender": "ai", "message": "Error parsing response: " + e.message });
+                        root.chatModel.append({ "sender": "ai", "message": "Error parsing response: " + e.message });
                     }
                 } else {
-                    chatModel.append({ "sender": "ai", "message": "Error: " + xhr.status + " " + xhr.statusText + "\n" + xhr.responseText });
+                    root.chatModel.append({ "sender": "ai", "message": "Error: " + xhr.status + " " + xhr.statusText + "\n" + xhr.responseText });
                 }
             }
         }
@@ -252,8 +317,8 @@ PlasmoidItem {
             {"role": "system", "content": root.systemPrompt}
         ];
         
-        for (var i = 0; i < chatModel.count; i++) {
-            var item = chatModel.get(i);
+        for (var i = 0; i < root.chatModel.count; i++) {
+            var item = root.chatModel.get(i);
             messages.push({
                 "role": item.sender === "user" ? "user" : "assistant",
                 "content": item.message
@@ -284,18 +349,16 @@ PlasmoidItem {
                 "systemInstruction": {"parts": [{"text": root.systemPrompt}]}
             };
         } else {
-            // OpenAI and compatible APIs
+            // OpenAI and compatible APIs (OpenAI, Groq, Custom)
             data = {
                 "model": root.currentModel,
                 "messages": messages
             };
         }
 
-        if (root.currentApiKey === "" && root.selectedProvider !== "custom") {
-            root.isLoading = false;
-            chatModel.append({ "sender": "ai", "message": "Please configure your API Key in the settings." });
-            return;
-        }
+        console.log("Sending request to:", root.currentApiUrl);
+        console.log("Provider:", root.selectedProvider);
+        console.log("Model:", root.currentModel);
 
         xhr.send(JSON.stringify(data));
     }

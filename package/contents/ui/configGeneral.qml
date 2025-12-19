@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
-Kirigami.FormLayout {
+Kirigami.ScrollablePage {
     id: page
 
     property alias cfg_systemPrompt: systemPromptField.text
@@ -31,144 +31,165 @@ Kirigami.FormLayout {
     property alias cfg_customModel: customModelField.text
     property alias cfg_customApiUrl: customApiUrlField.text
 
-    Item {
-        Kirigami.FormData.isSection: true
-        Kirigami.FormData.label: "General Settings"
-    }
+    Kirigami.FormLayout {
+        id: formLayout
 
-    TextArea {
-        id: systemPromptField
-        Kirigami.FormData.label: "System Prompt:"
-        placeholderText: "You are a helpful assistant."
-        Layout.fillWidth: true
-        Layout.minimumHeight: Kirigami.Units.gridUnit * 3
-    }
+        Item {
+            Kirigami.FormData.isSection: true
+            Kirigami.FormData.label: "General Settings"
+        }
 
-    Label {
-        Layout.fillWidth: true
-        text: "Note: Provider selection is available at the top of the chat window. Only providers with configured API keys will be shown."
-        wrapMode: Text.Wrap
-        font.italic: true
-        color: Kirigami.Theme.disabledTextColor
-    }
+        TextArea {
+            id: systemPromptField
+            Kirigami.FormData.label: "System Prompt:"
+            placeholderText: "You are a helpful assistant."
+            Layout.fillWidth: true
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+            Layout.minimumHeight: Kirigami.Units.gridUnit * 3
+        }
 
-    Item {
-        Kirigami.FormData.isSection: true
-        Kirigami.FormData.label: "OpenAI Configuration"
-    }
+        Label {
+            Layout.fillWidth: true
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+            text: "Note: Provider selection is available at the top of the chat window. Only providers with configured API keys will be shown."
+            wrapMode: Text.Wrap
+            font.italic: true
+            color: Kirigami.Theme.disabledTextColor
+        }
 
-    TextField {
-        id: openaiApiKeyField
-        Kirigami.FormData.label: "API Key:"
-        placeholderText: "sk-..."
-        echoMode: TextInput.Password
-    }
+        Item {
+            Kirigami.FormData.isSection: true
+            Kirigami.FormData.label: "OpenAI Configuration"
+        }
 
-    TextField {
-        id: openaiModelField
-        Kirigami.FormData.label: "Model:"
-        placeholderText: "gpt-3.5-turbo"
-    }
+        TextField {
+            id: openaiApiKeyField
+            Kirigami.FormData.label: "API Key:"
+            placeholderText: "sk-..."
+            echoMode: TextInput.Password
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    TextField {
-        id: openaiApiUrlField
-        Kirigami.FormData.label: "API URL:"
-        placeholderText: "https://api.openai.com/v1/chat/completions"
-    }
+        TextField {
+            id: openaiModelField
+            Kirigami.FormData.label: "Model:"
+            placeholderText: "gpt-3.5-turbo"
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    Item {
-        Kirigami.FormData.isSection: true
-        Kirigami.FormData.label: "Anthropic Configuration"
-    }
+        TextField {
+            id: openaiApiUrlField
+            Kirigami.FormData.label: "API URL:"
+            placeholderText: "https://api.openai.com/v1/chat/completions"
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    TextField {
-        id: anthropicApiKeyField
-        Kirigami.FormData.label: "API Key:"
-        placeholderText: "sk-ant-..."
-        echoMode: TextInput.Password
-    }
+        Item {
+            Kirigami.FormData.isSection: true
+            Kirigami.FormData.label: "Anthropic Configuration"
+        }
 
-    TextField {
-        id: anthropicModelField
-        Kirigami.FormData.label: "Model:"
-        placeholderText: "claude-3-sonnet-20240229"
-    }
+        TextField {
+            id: anthropicApiKeyField
+            Kirigami.FormData.label: "API Key:"
+            placeholderText: "sk-ant-..."
+            echoMode: TextInput.Password
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    TextField {
-        id: anthropicApiUrlField
-        Kirigami.FormData.label: "API URL:"
-        placeholderText: "https://api.anthropic.com/v1/messages"
-    }
+        TextField {
+            id: anthropicModelField
+            Kirigami.FormData.label: "Model:"
+            placeholderText: "claude-3-sonnet-20240229"
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    Item {
-        Kirigami.FormData.isSection: true
-        Kirigami.FormData.label: "Google Configuration"
-    }
+        TextField {
+            id: anthropicApiUrlField
+            Kirigami.FormData.label: "API URL:"
+            placeholderText: "https://api.anthropic.com/v1/messages"
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    TextField {
-        id: googleApiKeyField
-        Kirigami.FormData.label: "API Key:"
-        placeholderText: "AIza..."
-        echoMode: TextInput.Password
-    }
+        Item {
+            Kirigami.FormData.isSection: true
+            Kirigami.FormData.label: "Google Configuration"
+        }
 
-    TextField {
-        id: googleModelField
-        Kirigami.FormData.label: "Model:"
-        placeholderText: "gemini-pro"
-    }
+        TextField {
+            id: googleApiKeyField
+            Kirigami.FormData.label: "API Key:"
+            placeholderText: "AIza..."
+            echoMode: TextInput.Password
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    TextField {
-        id: googleApiUrlField
-        Kirigami.FormData.label: "API URL:"
-        placeholderText: "https://generativelanguage.googleapis.com/v1/models/"
-    }
+        TextField {
+            id: googleModelField
+            Kirigami.FormData.label: "Model:"
+            placeholderText: "gemini-pro"
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    Item {
-        Kirigami.FormData.isSection: true
-        Kirigami.FormData.label: "Groq Configuration"
-    }
+        TextField {
+            id: googleApiUrlField
+            Kirigami.FormData.label: "API URL:"
+            placeholderText: "https://generativelanguage.googleapis.com/v1/models/"
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    TextField {
-        id: groqApiKeyField
-        Kirigami.FormData.label: "API Key:"
-        placeholderText: "gsk_..."
-        echoMode: TextInput.Password
-    }
+        Item {
+            Kirigami.FormData.isSection: true
+            Kirigami.FormData.label: "Groq Configuration"
+        }
 
-    TextField {
-        id: groqModelField
-        Kirigami.FormData.label: "Model:"
-        placeholderText: "llama-3.3-70b-versatile"
-    }
+        TextField {
+            id: groqApiKeyField
+            Kirigami.FormData.label: "API Key:"
+            placeholderText: "gsk_..."
+            echoMode: TextInput.Password
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    TextField {
-        id: groqApiUrlField
-        Kirigami.FormData.label: "API URL:"
-        placeholderText: "https://api.groq.com/openai/v1/chat/completions"
-    }
+        TextField {
+            id: groqModelField
+            Kirigami.FormData.label: "Model:"
+            placeholderText: "llama-3.3-70b-versatile"
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    Item {
-        Kirigami.FormData.isSection: true
-        Kirigami.FormData.label: "Custom/Local Configuration"
-    }
+        TextField {
+            id: groqApiUrlField
+            Kirigami.FormData.label: "API URL:"
+            placeholderText: "https://api.groq.com/openai/v1/chat/completions"
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    TextField {
-        id: customApiKeyField
-        Kirigami.FormData.label: "API Key:"
-        placeholderText: "Optional for local models"
-        echoMode: TextInput.Password
-    }
+        Item {
+            Kirigami.FormData.isSection: true
+            Kirigami.FormData.label: "Custom/Local Configuration"
+        }
 
-    TextField {
-        id: customModelField
-        Kirigami.FormData.label: "Model:"
-        placeholderText: "llama2, mistral, etc."
-    }
+        TextField {
+            id: customApiKeyField
+            Kirigami.FormData.label: "API Key:"
+            placeholderText: "Optional for local models"
+            echoMode: TextInput.Password
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
 
-    TextField {
-        id: customApiUrlField
-        Kirigami.FormData.label: "API URL:"
-        placeholderText: "http://localhost:11434/v1/chat/completions"
+        TextField {
+            id: customModelField
+            Kirigami.FormData.label: "Model:"
+            placeholderText: "llama2, mistral, etc."
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
+
+        TextField {
+            id: customApiUrlField
+            Kirigami.FormData.label: "API URL:"
+            placeholderText: "http://localhost:11434/v1/chat/completions"
+            Layout.maximumWidth: Kirigami.Units.gridUnit * 30
+        }
     }
 }
