@@ -95,9 +95,25 @@ PlasmoidItem {
         }
     }
 
-    compactRepresentation: PlasmaComponents.Button {
-        icon.name: "kstars_supernovae"
-        onClicked: root.expanded = !root.expanded
+    compactRepresentation: Item {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        Layout.minimumWidth: Kirigami.Units.iconSizes.small
+        Layout.minimumHeight: Kirigami.Units.iconSizes.small
+        
+        Kirigami.Icon {
+            id: icon
+            anchors.fill: parent
+            source: "kstars_supernovae"
+            active: mouseArea.containsMouse
+        }
+        
+        MouseArea {
+            id: mouseArea
+            anchors.fill: parent
+            hoverEnabled: true
+            onClicked: root.expanded = !root.expanded
+        }
     }
 
     // Ensure selected provider is valid on startup
