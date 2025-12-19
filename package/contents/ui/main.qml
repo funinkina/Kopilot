@@ -88,17 +88,22 @@ PlasmoidItem {
 
     // Ensure selected provider is valid on startup
     Component.onCompleted: {
+        console.log("Widget initialized with provider:", selectedProvider)
+        console.log("Available providers:", JSON.stringify(availableProviders))
+        
         // Check if current selected provider is in available providers
         var providerFound = false
         for (var i = 0; i < availableProviders.length; i++) {
             if (availableProviders[i].value === selectedProvider) {
                 providerFound = true
+                console.log("Provider found:", selectedProvider)
                 break
             }
         }
         
         // If not found and we have providers, use the first one
         if (!providerFound && availableProviders.length > 0) {
+            console.log("Provider not found, switching to:", availableProviders[0].value)
             selectedProvider = availableProviders[0].value
             Plasmoid.configuration.selectedProvider = availableProviders[0].value
         }
@@ -132,18 +137,24 @@ PlasmoidItem {
                     
                     Component.onCompleted: {
                         // Set initial index based on selected provider
+                        var foundIndex = -1
                         for (var i = 0; i < root.availableProviders.length; i++) {
                             if (root.availableProviders[i].value === root.selectedProvider) {
-                                currentIndex = i
-                                return
+                                foundIndex = i
+                                break
                             }
                         }
-                        // If selected provider not found, use first available
-                        if (root.availableProviders.length > 0) {
+                        
+                        if (foundIndex >= 0) {
+                            currentIndex = foundIndex
+                        } else if (root.availableProviders.length > 0) {
+                            // If selected provider not found, use first available
                             currentIndex = 0
                             root.selectedProvider = root.availableProviders[0].value
                             Plasmoid.configuration.selectedProvider = root.availableProviders[0].value
                         }
+                        
+                        console.log("ComboBox initialized to index:", currentIndex, "provider:", currentValue)
                     }
                     
                     onActivated: {
@@ -172,21 +183,26 @@ PlasmoidItem {
                 // Add spacing at the bottom
                 footer: Item { height: Kirigami.Units.smallSpacing }
 
-                delegate: ColumnLayout {
+                delegate: Item {
                     width: ListView.view.width
-                    spacing: Kirigami.Units.smallSpacing
+                    height: messageRow.height + Kirigami.Units.largeSpacing
 
-                    // Message Bubble with hover and copy
-                    Item {
-                        Layout.alignment: model.sender === "user" ? Qt.AlignRight : Qt.AlignLeft
-                        Layout.maximumWidth: parent.width * 0.8
-                        implicitWidth: messageBubble.implicitWidth
-                        implicitHeight: messageBubble.implicitHeight
+                    RowLayout {
+                        id: messageRow
+                        width: parent.width
+                        anchors.top: parent.top
+                        anchors.topMargin: Kirigami.Units.largeSpacing
+                        spacing: Kirigami.Units.smallSpacing
+                        layoutDirection: model.sender === "user" ? Qt.RightToLeft : Qt.LeftToRight
 
+                        HoverHandler {
+                            id: rowHoverHandler
+                        }
+
+                        // Message Bubble
                         Rectangle {
                             id: messageBubble
-                            width: parent.width
-                            height: parent.height
+                            Layout.maximumWidth: parent.width * 0.8
                             
                             // Use Kirigami colors
                             color: model.sender === "user" ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
@@ -200,39 +216,33 @@ PlasmoidItem {
                             // Implicit size based on text
                             implicitWidth: msgText.implicitWidth + Kirigami.Units.largeSpacing * 2
                             implicitHeight: msgText.implicitHeight + Kirigami.Units.largeSpacing
+                            Layout.preferredWidth: implicitWidth
+                            Layout.preferredHeight: implicitHeight
 
-                            RowLayout {
+                            PlasmaComponents.Label {
+                                id: msgText
                                 anchors.fill: parent
-                                anchors.margins: Kirigami.Units.smallSpacing
-                                spacing: Kirigami.Units.smallSpacing
-
-                                PlasmaComponents.Label {
-                                    id: msgText
-                                    Layout.fillWidth: true
-                                    text: model.message
-                                    wrapMode: Text.Wrap
-                                    textFormat: Text.PlainText
-                                    color: model.sender === "user" ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
-                                }
-
-                                PlasmaComponents.ToolButton {
-                                    id: copyButton
-                                    icon.name: "edit-copy"
-                                    visible: messageHoverHandler.hovered
-                                    onClicked: {
-                                        root.copyToClipboard(model.message)
-                                    }
-                                    Layout.alignment: Qt.AlignTop
-                                    
-                                    PlasmaComponents.ToolTip {
-                                        text: "Copy message"
-                                    }
-                                }
+                                anchors.margins: Kirigami.Units.largeSpacing
+                                text: model.message
+                                wrapMode: Text.Wrap
+                                textFormat: Text.PlainText
+                                color: model.sender === "user" ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
                             }
                         }
 
-                        HoverHandler {
-                            id: messageHoverHandler
+                        // Copy button outside the bubble
+                        PlasmaComponents.ToolButton {
+                            id: copyButton
+                            icon.name: "edit-copy"
+                            visible: rowHoverHandler.hovered
+                            onClicked: {
+                                root.copyToClipboard(model.message)
+                            }
+                            Layout.alignment: Qt.AlignTop
+                            
+                            PlasmaComponents.ToolTip {
+                                text: "Copy message"
+                            }
                         }
                     }
                 }
