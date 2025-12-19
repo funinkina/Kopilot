@@ -12,8 +12,8 @@
         "Id": "org.kde.plasma.kopilot",
         "Name": "Kopilot",
         "Version": "1",
-        "Website": "https://example.com/user/plasmoid-helloworldplugin",
-        "BugReportUrl": "https://example.com/user/plasmoid-helloworldplugin/bugs"
+        "Website": "https://github.com/funinkina/Kopilot",
+        "BugReportUrl": "https://github.com/funinkina/Kopilot/issues"
     },
     "X-Plasma-API-Minimum-Version": "6.0",
     "KPackageStructure": "Plasma/Applet"
