@@ -23,6 +23,20 @@ PlasmoidItem {
     property bool isLoading: false
     property string selectedProvider: Plasmoid.configuration.selectedProvider
     
+    // Keep selectedProvider in sync with configuration
+    onSelectedProviderChanged: {
+        console.log("Root selectedProvider changed to:", selectedProvider)
+    }
+    
+    // Watch for configuration changes
+    Connections {
+        target: Plasmoid.configuration
+        function onSelectedProviderChanged() {
+            console.log("Configuration selectedProvider changed to:", Plasmoid.configuration.selectedProvider)
+            root.selectedProvider = Plasmoid.configuration.selectedProvider
+        }
+    }
+    
     // Chat model at root level so functions can access it
     property ListModel chatModel: ListModel {}
     
@@ -137,6 +151,10 @@ PlasmoidItem {
                     
                     Component.onCompleted: {
                         // Set initial index based on selected provider
+                        updateCurrentIndex()
+                    }
+                    
+                    function updateCurrentIndex() {
                         var foundIndex = -1
                         for (var i = 0; i < root.availableProviders.length; i++) {
                             if (root.availableProviders[i].value === root.selectedProvider) {
@@ -154,12 +172,33 @@ PlasmoidItem {
                             Plasmoid.configuration.selectedProvider = root.availableProviders[0].value
                         }
                         
-                        console.log("ComboBox initialized to index:", currentIndex, "provider:", currentValue)
+                        console.log("ComboBox index updated to:", currentIndex, "provider:", currentValue)
+                    }
+                    
+                    // Update ComboBox when root.selectedProvider changes externally
+                    Connections {
+                        target: root
+                        function onSelectedProviderChanged() {
+                            if (providerSelector.currentValue !== root.selectedProvider) {
+                                console.log("Syncing ComboBox to match root.selectedProvider:", root.selectedProvider)
+                                providerSelector.updateCurrentIndex()
+                            }
+                        }
                     }
                     
                     onActivated: {
+                        console.log("Provider manually changed to:", currentValue)
                         root.selectedProvider = currentValue
                         Plasmoid.configuration.selectedProvider = currentValue
+                    }
+                    
+                    // Update root.selectedProvider when currentValue changes
+                    onCurrentValueChanged: {
+                        if (currentValue !== root.selectedProvider) {
+                            console.log("ComboBox currentValue changed to:", currentValue, "updating root")
+                            root.selectedProvider = currentValue
+                            Plasmoid.configuration.selectedProvider = currentValue
+                        }
                     }
                     
                     visible: root.availableProviders.length > 0
