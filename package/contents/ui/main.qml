@@ -10,11 +10,40 @@ PlasmoidItem {
     id: root
 
     // Access configuration
-    property string apiKey: Plasmoid.configuration.apiKey
-    property string apiUrl: Plasmoid.configuration.apiUrl
-    property string modelName: Plasmoid.configuration.modelName
+    property string selectedProvider: Plasmoid.configuration.selectedProvider
     property string systemPrompt: Plasmoid.configuration.systemPrompt
     property bool isLoading: false
+    
+    // Helper properties to get current provider settings
+    property string currentApiKey: {
+        switch(selectedProvider) {
+            case "openai": return Plasmoid.configuration.openaiApiKey
+            case "anthropic": return Plasmoid.configuration.anthropicApiKey
+            case "google": return Plasmoid.configuration.googleApiKey
+            case "custom": return Plasmoid.configuration.customApiKey
+            default: return ""
+        }
+    }
+    
+    property string currentApiUrl: {
+        switch(selectedProvider) {
+            case "openai": return Plasmoid.configuration.openaiApiUrl
+            case "anthropic": return Plasmoid.configuration.anthropicApiUrl
+            case "google": return Plasmoid.configuration.googleApiUrl
+            case "custom": return Plasmoid.configuration.customApiUrl
+            default: return ""
+        }
+    }
+    
+    property string currentModel: {
+        switch(selectedProvider) {
+            case "openai": return Plasmoid.configuration.openaiModel
+            case "anthropic": return Plasmoid.configuration.anthropicModel
+            case "google": return Plasmoid.configuration.googleModel
+            case "custom": return Plasmoid.configuration.customModel
+            default: return ""
+        }
+    }
 
     compactRepresentation: PlasmaComponents.Button {
         icon.name: "kstars_supernovae"
@@ -115,9 +144,18 @@ PlasmoidItem {
 
     function callApi(prompt) {
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", root.apiUrl);
+        xhr.open("POST", root.currentApiUrl);
         xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.setRequestHeader("Authorization", "Bearer " + root.apiKey);
+        
+        // Set authorization header based on provider
+        if (root.selectedProvider === "anthropic") {
+            xhr.setRequestHeader("x-api-key", root.currentApiKey);
+            xhr.setRequestHeader("anthropic-version", "2023-06-01");
+        } else if (root.selectedProvider === "google") {
+            // Google uses API key in URL
+        } else {
+            xhr.setRequestHeader("Authorization", "Bearer " + root.currentApiKey);
+        }
 
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -125,7 +163,17 @@ PlasmoidItem {
                 if (xhr.status === 200) {
                     try {
                         var response = JSON.parse(xhr.responseText);
-                        var reply = response.choices[0].message.content;
+                        var reply = "";
+                        
+                        // Parse response based on provider
+                        if (root.selectedProvider === "anthropic") {
+                            reply = response.content[0].text;
+                        } else if (root.selectedProvider === "google") {
+                            reply = response.candidates[0].content.parts[0].text;
+                        } else {
+                            reply = response.choices[0].message.content;
+                        }
+                        
                         chatModel.append({ "sender": "ai", "message": reply });
                     } catch (e) {
                         chatModel.append({ "sender": "ai", "message": "Error parsing response: " + e.message });
@@ -148,12 +196,38 @@ PlasmoidItem {
             });
         }
 
-        var data = {
-            "model": root.modelName,
-            "messages": messages
-        };
+        var data = {};
+        
+        // Format request based on provider
+        if (root.selectedProvider === "anthropic") {
+            data = {
+                "model": root.currentModel,
+                "messages": messages.slice(1), // Anthropic doesn't use system in messages
+                "system": root.systemPrompt,
+                "max_tokens": 1024
+            };
+        } else if (root.selectedProvider === "google") {
+            // Google Gemini has a different format
+            var contents = [];
+            for (var j = 1; j < messages.length; j++) {
+                contents.push({
+                    "parts": [{"text": messages[j].content}],
+                    "role": messages[j].role === "assistant" ? "model" : "user"
+                });
+            }
+            data = {
+                "contents": contents,
+                "systemInstruction": {"parts": [{"text": root.systemPrompt}]}
+            };
+        } else {
+            // OpenAI and compatible APIs
+            data = {
+                "model": root.currentModel,
+                "messages": messages
+            };
+        }
 
-        if (root.apiKey === "") {
+        if (root.currentApiKey === "" && root.selectedProvider !== "custom") {
             root.isLoading = false;
             chatModel.append({ "sender": "ai", "message": "Please configure your API Key in the settings." });
             return;

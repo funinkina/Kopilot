@@ -4,21 +4,69 @@
     xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
     <kcfgfile name="" />
     <group name="General">
-        <entry name="apiKey" type="String">
-            <label>API Key</label>
-            <default></default>
-        </entry>
-        <entry name="apiUrl" type="String">
-            <label>API URL</label>
-            <default>https://api.openai.com/v1/chat/completions</default>
-        </entry>
-        <entry name="modelName" type="String">
-            <label>Model Name</label>
-            <default>gpt-3.5-turbo</default>
+        <entry name="selectedProvider" type="String">
+            <label>Selected Provider</label>
+            <default>openai</default>
         </entry>
         <entry name="systemPrompt" type="String">
             <label>System Prompt</label>
             <default>You are a helpful assistant.</default>
+        </entry>
+    </group>
+    <group name="OpenAI">
+        <entry name="openaiApiKey" type="String">
+            <label>OpenAI API Key</label>
+            <default></default>
+        </entry>
+        <entry name="openaiModel" type="String">
+            <label>OpenAI Model</label>
+            <default>gpt-3.5-turbo</default>
+        </entry>
+        <entry name="openaiApiUrl" type="String">
+            <label>OpenAI API URL</label>
+            <default>https://api.openai.com/v1/chat/completions</default>
+        </entry>
+    </group>
+    <group name="Anthropic">
+        <entry name="anthropicApiKey" type="String">
+            <label>Anthropic API Key</label>
+            <default></default>
+        </entry>
+        <entry name="anthropicModel" type="String">
+            <label>Anthropic Model</label>
+            <default>claude-3-sonnet-20240229</default>
+        </entry>
+        <entry name="anthropicApiUrl" type="String">
+            <label>Anthropic API URL</label>
+            <default>https://api.anthropic.com/v1/messages</default>
+        </entry>
+    </group>
+    <group name="Google">
+        <entry name="googleApiKey" type="String">
+            <label>Google API Key</label>
+            <default></default>
+        </entry>
+        <entry name="googleModel" type="String">
+            <label>Google Model</label>
+            <default>gemini-pro</default>
+        </entry>
+        <entry name="googleApiUrl" type="String">
+            <label>Google API URL</label>
+            <default>https://generativelanguage.googleapis.com/v1/models/</default>
+        </entry>
+    </group>
+    <group name="Custom">
+        <entry name="customApiKey" type="String">
+            <label>Custom API Key</label>
+            <default></default>
+        </entry>
+        <entry name="customModel" type="String">
+            <label>Custom Model</label>
+            <default></default>
+        </entry>
+        <entry name="customApiUrl" type="String">
+            <label>Custom API URL</label>
+            <default></default>
         </entry>
     </group>
 </kcfg>
