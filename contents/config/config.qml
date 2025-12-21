@@ -19,7 +19,7 @@ ConfigModel {
     }
     ConfigCategory {
         name: "Google"
-        icon: Qt.resolvedUrl("../icons/google.png")
+        icon: Qt.resolvedUrl("../icons/gemini.png")
         source: "configGoogle.qml"
     }
     ConfigCategory {
