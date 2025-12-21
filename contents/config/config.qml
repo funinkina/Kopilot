@@ -9,27 +9,27 @@ ConfigModel {
     }
     ConfigCategory {
         name: "OpenAI"
-        icon: "network-connect"
+        icon: Qt.resolvedUrl("../icons/openai.png")
         source: "configOpenAI.qml"
     }
     ConfigCategory {
         name: "Anthropic"
-        icon: "network-connect"
+        icon: Qt.resolvedUrl("../icons/anthropic.png")
         source: "configAnthropic.qml"
     }
     ConfigCategory {
         name: "Google"
-        icon: "network-connect"
+        icon: Qt.resolvedUrl("../icons/google.png")
         source: "configGoogle.qml"
     }
     ConfigCategory {
         name: "Groq"
-        icon: "network-connect"
+        icon: Qt.resolvedUrl("../icons/groq.png")
         source: "configGroq.qml"
     }
     ConfigCategory {
         name: "Custom"
-        icon: "network-server"
+        icon: "network-server-symbolic"
         source: "configCustom.qml"
     }
 }
